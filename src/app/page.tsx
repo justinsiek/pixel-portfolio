@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import PIXEL_FONT from "@/components/PixelFont"
+import { useRouter } from "next/navigation"
 
 const COLOR = "#FFFFFF"
 const HIT_COLOR = "#333333"
@@ -39,6 +40,7 @@ interface Paddle {
 }
 
 export function Hero() {
+  const router = useRouter()
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const pixelsRef = useRef<Pixel[]>([])
   const ballRef = useRef<Ball>({ x: 0, y: 0, dx: 0, dy: 0, radius: 0 })
@@ -65,8 +67,8 @@ export function Hero() {
       setScore(0)
       scoreRef.current = 0
       const scale = scaleRef.current
-      const LARGE_PIXEL_SIZE = 6 * scale
-      const SMALL_PIXEL_SIZE = 4 * scale
+      const LARGE_PIXEL_SIZE = 1.3 * scale
+      const SMALL_PIXEL_SIZE = scale
       const BALL_SPEED = 6 * scale
 
       pixelsRef.current = []
@@ -430,14 +432,59 @@ export function Hero() {
       requestAnimationFrame(gameLoop)
     }
 
+    const handleClick = (e: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect()
+      const scaleX = canvas.width / rect.width
+      const scaleY = canvas.height / rect.height
+      const mouseX = (e.clientX - rect.left) * scaleX
+      const mouseY = (e.clientY - rect.top) * scaleY
+
+      const staticPaddles = paddlesRef.current.filter(p => p.isStatic)
+      const paths = ['/about', '/projects', '/contact']
+      
+      staticPaddles.forEach((paddle, index) => {
+        if (mouseX >= paddle.x && mouseX <= paddle.x + paddle.width &&
+            mouseY >= paddle.y && mouseY <= paddle.y + paddle.height) {
+          router.push(paths[index])
+        }
+      })
+    }
+
+    // Add hover state tracking
+    let isHovering = false
+
+    const handleHover = (e: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect()
+      const scaleX = canvas.width / rect.width
+      const scaleY = canvas.height / rect.height
+      const mouseX = (e.clientX - rect.left) * scaleX
+      const mouseY = (e.clientY - rect.top) * scaleY
+
+      const isOverButton = paddlesRef.current.some(paddle => 
+        paddle.isStatic &&
+        mouseX >= paddle.x && 
+        mouseX <= paddle.x + paddle.width &&
+        mouseY >= paddle.y && 
+        mouseY <= paddle.y + paddle.height
+      )
+
+
+      canvas.style.cursor = isOverButton ? 'pointer' : 'default'
+    }
+
+    canvas.addEventListener('click', handleClick)
+    canvas.addEventListener('mousemove', handleHover)
+
     resizeCanvas()
     window.addEventListener("resize", resizeCanvas)
     gameLoop()
 
     return () => {
       window.removeEventListener("resize", resizeCanvas)
+      canvas.removeEventListener('click', handleClick)
+      canvas.removeEventListener('mousemove', handleHover) // Cleanup hover listener
     }
-  }, [])
+  }, [router])
 
   return (
     <canvas
