@@ -67,12 +67,20 @@ export function Hero() {
       setScore(0)
       scoreRef.current = 0
       const scale = scaleRef.current
-      const LARGE_PIXEL_SIZE = 1.3 * scale
-      const SMALL_PIXEL_SIZE = scale
+      
+      // Original sizes
+      const NAME_PIXEL_SIZE = 18 * scale
+      const OTHER_PIXEL_SIZE = 10 * scale  // Reduced from original 1.0 * scale
       const BALL_SPEED = 6 * scale
 
       pixelsRef.current = []
-      const words = ["JUSTIN SIEK", "SOFTWARE DEVELOPER"]
+      const wordGroups = [
+        "JUSTIN SIEK",
+        "SOFTWARE DEVELOPER",
+        "UI/UX DESIGNER",
+        "FOOD ENTHUSIAST"
+      ]
+
 
       const calculateWordWidth = (word: string, pixelSize: number) => {
         return (
@@ -84,64 +92,53 @@ export function Hero() {
         )
       }
 
-      const totalWidthLarge = calculateWordWidth(words[0], LARGE_PIXEL_SIZE)
-      const totalWidthSmall = words[1].split(" ").reduce((width, word, index) => {
-        return width + calculateWordWidth(word, SMALL_PIXEL_SIZE) + (index > 0 ? WORD_SPACING * SMALL_PIXEL_SIZE : 0)
-      }, 0)
-      const totalWidth = Math.max(totalWidthLarge, totalWidthSmall)
+      // Calculate scale factor only for non-name text
+      const otherLines = wordGroups.slice(1)
+      const otherLineWidths = otherLines.map(line => 
+        line.split(" ").reduce((width, word) => 
+          width + calculateWordWidth(word, OTHER_PIXEL_SIZE), 0
+        )
+      )
+      
+      const maxOtherWidth = Math.max(...otherLineWidths)
+      const availableWidth = canvas.width * 0.9
+      const otherScaleFactor = Math.min(1, availableWidth / maxOtherWidth)
+
+      // Apply scaling only to non-name text
+      const adjustedNameSize = NAME_PIXEL_SIZE
+      const adjustedOtherSize = OTHER_PIXEL_SIZE * otherScaleFactor
+
+      const lineWidths = wordGroups.map((line, index) => {
+        const pixelSize = index === 0 ? adjustedNameSize : adjustedOtherSize
+        return line.split(" ").reduce((width, word, wordIndex) => {
+          return width + calculateWordWidth(word, pixelSize) + (wordIndex > 0 ? WORD_SPACING * pixelSize : 0)
+        }, 0)
+      })
+      const totalWidth = Math.max(...lineWidths)
       const scaleFactor = (canvas.width * 0.8) / totalWidth
 
-      const adjustedLargePixelSize = LARGE_PIXEL_SIZE * scaleFactor
-      const adjustedSmallPixelSize = SMALL_PIXEL_SIZE * scaleFactor
+      const adjustedLargePixelSize = adjustedNameSize * scaleFactor
+      const adjustedSmallPixelSize = adjustedOtherSize * scaleFactor
 
       const largeTextHeight = 5 * adjustedLargePixelSize
       const smallTextHeight = 5 * adjustedSmallPixelSize
-      const spaceBetweenLines = 5 * adjustedLargePixelSize
-      const totalTextHeight = largeTextHeight + spaceBetweenLines + smallTextHeight
+      const spaceBetweenLines = 2.5 * adjustedLargePixelSize
+      const totalTextHeight = largeTextHeight + (wordGroups.length - 1) * (smallTextHeight + spaceBetweenLines)
 
       let startY = (canvas.height - totalTextHeight) * 0.4
       const initialTextY = startY
 
-      words.forEach((word, wordIndex) => {
-        const pixelSize = wordIndex === 0 ? adjustedLargePixelSize : adjustedSmallPixelSize
-        const totalWidth =
-          wordIndex === 0
-            ? calculateWordWidth(word, adjustedLargePixelSize)
-            : words[1].split(" ").reduce((width, w, index) => {
-                return (
-                  width +
-                  calculateWordWidth(w, adjustedSmallPixelSize) +
-                  (index > 0 ? WORD_SPACING * adjustedSmallPixelSize : 0)
-                )
-              }, 0)
+      wordGroups.forEach((word, wordIndex) => {
+        const pixelSize = wordIndex === 0 ? adjustedNameSize : adjustedOtherSize
+        const words = word.split(" ")
+        const lineWidth = words.reduce((width, w, index) => {
+          return width + calculateWordWidth(w, pixelSize) + (index > 0 ? WORD_SPACING * pixelSize : 0)
+        }, 0)
 
-        let startX = (canvas.width - totalWidth) / 2
+        let startX = (canvas.width - lineWidth) / 2
 
-        if (wordIndex === 1) {
-          word.split(" ").forEach((subWord) => {
-            subWord.split("").forEach((letter) => {
-              const pixelMap = PIXEL_FONT[letter as keyof typeof PIXEL_FONT]
-              if (!pixelMap) return
-
-              for (let i = 0; i < pixelMap.length; i++) {
-                for (let j = 0; j < pixelMap[i].length; j++) {
-                  if (pixelMap[i][j]) {
-                    const x = startX + j * pixelSize
-                    const y = startY + i * pixelSize
-                    pixelsRef.current.push({ x, y, size: pixelSize, hit: false })
-                  }
-                }
-              }
-              startX += (pixelMap[0].length + LETTER_SPACING) * pixelSize
-            })
-            startX += WORD_SPACING * adjustedSmallPixelSize
-          })
-        } else {
-          word.split("").forEach((letter) => {
-            if (letter === " ") {
-              startX += LETTER_SPACING * pixelSize * 2 
-              return
-            }
+        words.forEach((subWord) => {
+          subWord.split("").forEach((letter) => {
             const pixelMap = PIXEL_FONT[letter as keyof typeof PIXEL_FONT]
             if (!pixelMap) return
 
@@ -156,8 +153,12 @@ export function Hero() {
             }
             startX += (pixelMap[0].length + LETTER_SPACING) * pixelSize
           })
-        }
-        startY += wordIndex === 0 ? largeTextHeight + spaceBetweenLines : 0
+          startX += WORD_SPACING * pixelSize
+        })
+        
+        startY += wordIndex === 0 ? 
+          largeTextHeight + spaceBetweenLines : 
+          smallTextHeight + spaceBetweenLines
       })
 
       // Initialize ball position near the top right corner
@@ -169,47 +170,25 @@ export function Hero() {
         y: ballStartY,
         dx: -BALL_SPEED,
         dy: BALL_SPEED,
-        radius: adjustedLargePixelSize / 2,
+        radius: adjustedLargePixelSize / 2.5,
       }
 
       // Add centered static bar under text
       const barPadding = 20 * scale
       const barWidth = 200 * scale
-      const barY = initialTextY + totalTextHeight + barPadding
+      const barY = (initialTextY + totalTextHeight + barPadding) * 0.9
       const barHeight = adjustedLargePixelSize * 2.25
 
       const paddleWidth = adjustedLargePixelSize
       const paddleLength = 7 * adjustedLargePixelSize
 
       paddlesRef.current = [
-        {
-          x: 0,
-          y: canvas.height / 2 - paddleLength / 2,
-          width: paddleWidth,
-          height: paddleLength,
-          targetY: canvas.height / 2 - paddleLength / 2,
-          isVertical: true,
-        },
-        {
-          x: canvas.width - paddleWidth,
-          y: canvas.height / 2 - paddleLength / 2,
-          width: paddleWidth,
-          height: paddleLength,
-          targetY: canvas.height / 2 - paddleLength / 2,
-          isVertical: true,
-        },
+        
+  
         {
           x: canvas.width / 2 - paddleLength / 2,
-          y: 0,
-          width: paddleLength,
-          height: paddleWidth,
-          targetY: canvas.width / 2 - paddleLength / 2,
-          isVertical: false,
-        },
-        {
-          x: canvas.width / 2 - paddleLength / 2,
-          y: canvas.height - paddleWidth,
-          width: paddleLength,
+          y: canvas.height - 3.5 * paddleWidth,
+          width: paddleLength * 1.5,
           height: paddleWidth,
           targetY: canvas.width / 2 - paddleLength / 2,
           isVertical: false,
@@ -404,8 +383,8 @@ export function Hero() {
       const scoreText = `SCORE:${scoreRef.current}`
       const scale = scaleRef.current
       const numeralSize = 3 * scale
-      let startX = canvas.width - 10 * scale - (scoreText.length * (5 + LETTER_SPACING) * numeralSize)
-      const startY = 10 * scale
+      let startX = canvas.width - 30 * scale - (scoreText.length * (5 + LETTER_SPACING) * numeralSize)
+      const startY = 30 * scale
 
       scoreText.split('').forEach((char) => {
         const pixelMap = PIXEL_FONT[char as keyof typeof PIXEL_FONT] || []
