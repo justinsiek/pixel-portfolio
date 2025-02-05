@@ -35,6 +35,7 @@ interface Paddle {
   height: number
   targetY: number
   isVertical: boolean
+  isStatic?: boolean
 }
 
 export function Hero() {
@@ -97,6 +98,7 @@ export function Hero() {
       const totalTextHeight = largeTextHeight + spaceBetweenLines + smallTextHeight
 
       let startY = (canvas.height - totalTextHeight) * 0.4
+      const initialTextY = startY
 
       words.forEach((word, wordIndex) => {
         const pixelSize = wordIndex === 0 ? adjustedLargePixelSize : adjustedSmallPixelSize
@@ -157,7 +159,7 @@ export function Hero() {
       })
 
       // Initialize ball position near the top right corner
-      const ballStartX = canvas.width * 0.9
+      const ballStartX = canvas.width * 0.85
       const ballStartY = canvas.height * 0.1
 
       ballRef.current = {
@@ -167,6 +169,12 @@ export function Hero() {
         dy: BALL_SPEED,
         radius: adjustedLargePixelSize / 2,
       }
+
+      // Add centered static bar under text
+      const barPadding = 20 * scale
+      const barWidth = 200 * scale
+      const barY = initialTextY + totalTextHeight + barPadding
+      const barHeight = adjustedLargePixelSize * 2.25
 
       const paddleWidth = adjustedLargePixelSize
       const paddleLength = 7 * adjustedLargePixelSize
@@ -204,6 +212,33 @@ export function Hero() {
           targetY: canvas.width / 2 - paddleLength / 2,
           isVertical: false,
         },
+        {
+          x: canvas.width/2 - 2*barWidth - barWidth/2,
+          y: barY + canvas.height/10,
+          width: barWidth,
+          height: barHeight,
+          targetY: barY,
+          isVertical: false,
+          isStatic: true
+        },
+        {
+          x: canvas.width/2 - barWidth/2,
+          y: barY + canvas.height/10,
+          width: barWidth,
+          height: barHeight,
+          targetY: barY,
+          isVertical: false,
+          isStatic: true
+        },
+        {
+          x: canvas.width/2 + barWidth + barWidth/2,
+          y: barY + canvas.height/10,
+          width: barWidth,
+          height: barHeight,
+          targetY: barY,
+          isVertical: false,
+          isStatic: true
+        },
       ]
     }
 
@@ -238,12 +273,35 @@ export function Hero() {
             ball.x > paddle.x &&
             ball.x < paddle.x + paddle.width
           ) {
-            ball.dy = -ball.dy
+            // Calculate penetration depths
+            const penetrationLeft = ball.x + ball.radius - paddle.x
+            const penetrationRight = paddle.x + paddle.width - (ball.x - ball.radius)
+            const penetrationTop = ball.y + ball.radius - paddle.y
+            const penetrationBottom = paddle.y + paddle.height - (ball.y - ball.radius)
+            
+            // Find smallest penetration
+            const minPenetration = Math.min(
+              penetrationLeft,
+              penetrationRight,
+              penetrationTop,
+              penetrationBottom
+            )
+
+            // Resolve collision based on smallest penetration
+            if (minPenetration === penetrationLeft || minPenetration === penetrationRight) {
+              ball.dx = -ball.dx
+              ball.x += ball.dx * 2 // Move outside paddle
+            } else {
+              ball.dy = -ball.dy
+              ball.y += ball.dy * 2 // Move outside paddle
+            }
           }
         }
       })
 
       paddles.forEach((paddle) => {
+        if (paddle.isStatic) return // Keep static check for movement only
+        
         if (paddle.isVertical) {
           paddle.targetY = ball.y - paddle.height / 2
           paddle.targetY = Math.max(0, Math.min(canvas.height - paddle.height, paddle.targetY))
@@ -293,9 +351,51 @@ export function Hero() {
       ctx.arc(ballRef.current.x, ballRef.current.y, ballRef.current.radius, 0, Math.PI * 2)
       ctx.fill()
 
+      // Draw paddles
       ctx.fillStyle = PADDLE_COLOR
       paddlesRef.current.forEach((paddle) => {
         ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height)
+      })
+
+      // Add text to static paddles
+      const staticPaddles = paddlesRef.current.filter(p => p.isStatic)
+      const paddleTexts = ["ABOUT", "PROJECTS", "CONTACT"]
+      staticPaddles.forEach((paddle, index) => {
+        const text = paddleTexts[index]
+        const scale = scaleRef.current
+        const pixelSize = 3 * scale  // Match score text size
+        const letterSpacing = LETTER_SPACING * pixelSize
+
+        // Calculate total text width
+        let totalWidth = text.split('').reduce((width, letter) => {
+          const letterWidth = PIXEL_FONT[letter as keyof typeof PIXEL_FONT]?.[0]?.length ?? 0
+          return width + letterWidth * pixelSize + letterSpacing
+        }, -letterSpacing)
+
+        // Center text in paddle
+        let startX = paddle.x + (paddle.width - totalWidth) / 2
+        const startY = paddle.y + (paddle.height - 5 * pixelSize) / 2  // 5 rows in font
+
+        // Draw each letter
+        ctx.fillStyle = BACKGROUND_COLOR
+        text.split('').forEach(letter => {
+          const pixelMap = PIXEL_FONT[letter as keyof typeof PIXEL_FONT]
+          if (!pixelMap) return
+
+          for (let i = 0; i < pixelMap.length; i++) {
+            for (let j = 0; j < pixelMap[i].length; j++) {
+              if (pixelMap[i][j]) {
+                ctx.fillRect(
+                  startX + j * pixelSize,
+                  startY + i * pixelSize,
+                  pixelSize,
+                  pixelSize
+                )
+              }
+            }
+          }
+          startX += (pixelMap[0].length + LETTER_SPACING) * pixelSize
+        })
       })
 
       // Draw score with pixel numerals
