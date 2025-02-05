@@ -170,7 +170,7 @@ export function Hero() {
         y: ballStartY,
         dx: -BALL_SPEED,
         dy: BALL_SPEED,
-        radius: adjustedLargePixelSize / 2.5,
+        radius: adjustedLargePixelSize / 2.8,
       }
 
       // Add centered static bar under text
