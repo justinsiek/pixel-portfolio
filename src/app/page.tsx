@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import PIXEL_FONT from "@/components/PixelFont"
 import { useRouter } from "next/navigation"
+import { motion, AnimatePresence } from "framer-motion"
 
 const COLOR = "#FFFFFF"
 const HIT_COLOR = "#333333"
@@ -39,6 +40,44 @@ interface Paddle {
   isStatic?: boolean
 }
 
+const PixelText = ({ text, scale = 2, color = "#FFF" }: { text: string; scale?: number; color?: string }) => {
+  const chars = text.split('')
+  const charWidths = chars.map(char => PIXEL_FONT[char as keyof typeof PIXEL_FONT]?.[0]?.length ?? 0)
+  const totalWidth = charWidths.reduce((sum, width, index) => sum + width * scale + (index > 0 ? LETTER_SPACING * scale : 0), 0)
+  const height = 5 * scale // 5 rows in the font
+
+  return (
+    <div className="relative" style={{ width: totalWidth, height }}>
+      {chars.map((char, charIndex) => {
+        const pixelMap = PIXEL_FONT[char as keyof typeof PIXEL_FONT]
+        if (!pixelMap) return null
+        
+        const charWidth = charWidths[charIndex]
+        let xOffset = charIndex > 0 ? LETTER_SPACING * scale : 0
+        xOffset += chars.slice(0, charIndex).reduce((sum, _, i) => sum + charWidths[i] * scale + LETTER_SPACING * scale, 0)
+
+        return pixelMap.map((row, i) =>
+          row.map((filled, j) => 
+            filled ? (
+              <div
+                key={`${char}-${charIndex}-${i}-${j}`}
+                className="absolute"
+                style={{
+                  backgroundColor: color,
+                  width: scale,
+                  height: scale,
+                  left: xOffset + j * scale,
+                  top: i * scale,
+                }}
+              />
+            ) : null
+          )
+        )
+      })}
+    </div>
+  )
+}
+
 export function Hero() {
   const router = useRouter()
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -48,8 +87,31 @@ export function Hero() {
   const scaleRef = useRef(1)
   const [score, setScore] = useState(0)
   const scoreRef = useRef(0)
+  const [loading, setLoading] = useState(true)
+  const [progress, setProgress] = useState(0)
+  const [loadingText, setLoadingText] = useState("LOADING...")
 
   useEffect(() => {
+    const loadInterval = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(loadInterval)
+          setTimeout(() => {
+            setLoadingText("DONE!")
+            setTimeout(() => setLoading(false), 1000)
+          }, 500)
+          return 100
+        }
+        return prev + 1
+      })
+    }, 30)
+
+    return () => clearInterval(loadInterval)
+  }, [])
+
+  useEffect(() => {
+    if (loading) return
+
     const canvas = canvasRef.current
     if (!canvas) return
 
@@ -463,14 +525,47 @@ export function Hero() {
       canvas.removeEventListener('click', handleClick)
       canvas.removeEventListener('mousemove', handleHover) // Cleanup hover listener
     }
-  }, [router])
+  }, [loading, router])
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="fixed top-0 left-0 w-full h-full"
-      aria-label="Prompting Is All You Need: Fullscreen Pong game with pixel text"
-    />
+    <>
+      <AnimatePresence>
+        {loading && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black flex items-center justify-center"
+          >
+            <div className="text-center flex flex-col items-center gap-8">
+              <motion.div
+                key={loadingText}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+              >
+                <PixelText text={loadingText} scale={4} color="#FFF" />
+              </motion.div>
+            
+              
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                <PixelText text={`${progress}%`} scale={4} color="#FFF" />
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {!loading && (
+        <canvas
+          ref={canvasRef}
+          className="fixed top-0 left-0 w-full h-full"
+          aria-label="Prompting Is All You Need: Fullscreen Pong game with pixel text"
+        />
+      )}
+    </>
   )
 }
 
