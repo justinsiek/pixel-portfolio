@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 
 const COLOR = "#FFFFFF"
-const HIT_COLOR = "#555555"
+const HIT_COLOR = "#333333"
 const BACKGROUND_COLOR = "#000000"
 const BALL_COLOR = "#FFFFFF"
 const PADDLE_COLOR = "#FFFFFF"
@@ -79,7 +79,7 @@ const PixelText = ({ text, scale = 2, color = "#FFF" }: { text: string; scale?: 
   )
 }
 
-export function Hero() {
+function Hero() {
   const router = useRouter()
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const pixelsRef = useRef<Pixel[]>([])
