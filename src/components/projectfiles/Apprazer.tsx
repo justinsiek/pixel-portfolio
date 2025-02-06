@@ -1,15 +1,21 @@
-import React from 'react'
+import React, { useState } from 'react'
 import PixelText from '../PixelText'
 import Image from 'next/image'
+import ModalImage from '../ModalImage'
 
 const Apprazer = () => {
+  const [selectedImage, setSelectedImage] = useState<{
+    src: string
+    alt: string
+    caption: string
+  } | null>(null)
+
   return (
     <div className="min-h-screen text-white px-4 py-8">
       <div className="flex flex-col">
         <PixelText text="APPRAZER" scale={8} />
         <div className="mt-8 max-w-5xl w-full grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Left Column: Project Description */}
-
           <div className="text-left">
             <p className="font-pixel text-xl">
               Apprazer is an AI-powered mortgage approval system built by a team of 4 at IrvineHacks.
@@ -39,8 +45,23 @@ const Apprazer = () => {
           <div className="space-y-8">
             {/* System Architecture Diagram */}
             <figure>
-              <div className="w-full h-64 flex items-center justify-center">
-                <Image src="/ApprazerDashA.jpg" alt="System Architecture Diagram" width={500} height={500} />
+              <div
+                className="w-full h-64 flex items-center justify-center cursor-pointer"
+                onClick={() =>
+                  setSelectedImage({
+                    src: '/ApprazerDashA.jpg',
+                    alt: 'System Architecture Diagram',
+                    caption: 'Admin Dashboard',
+                  })
+                }
+              >
+                <Image
+                  src="/ApprazerDashA.jpg"
+                  alt="System Architecture Diagram"
+                  width={500}
+                  height={500}
+                  className="object-contain"
+                />
               </div>
               <figcaption className="mt-2 text-center text-sm text-white">
                 Admin Dashboard
@@ -49,19 +70,40 @@ const Apprazer = () => {
 
             {/* Analytics Dashboard Screenshot */}
             <figure>
-              <div className="w-full h-64 flex items-center justify-center">
-                <Image src="/ApprazerDashB.jpg" alt="Analytics Dashboard Screenshot" width={500} height={500} />
+              <div
+                className="w-full h-64 flex items-center justify-center cursor-pointer"
+                onClick={() =>
+                  setSelectedImage({
+                    src: '/ApprazerDashB.jpg',
+                    alt: 'Analytics Dashboard Screenshot',
+                    caption: 'Loan Dashboard',
+                  })
+                }
+              >
+                <Image
+                  src="/ApprazerDashB.jpg"
+                  alt="Analytics Dashboard Screenshot"
+                  width={500}
+                  height={500}
+                  className="object-contain"
+                />
               </div>
-
-
               <figcaption className="mt-2 text-center text-sm text-white">
                 Loan Dashboard
               </figcaption>
             </figure>
-
           </div>
         </div>
       </div>
+
+      {selectedImage && (
+        <ModalImage
+          src={selectedImage.src}
+          alt={selectedImage.alt}
+          caption={selectedImage.caption}
+          onClose={() => setSelectedImage(null)}
+        />
+      )}
     </div>
   )
 }

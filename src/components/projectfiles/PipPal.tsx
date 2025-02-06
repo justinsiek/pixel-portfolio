@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import PixelText from '../PixelText'
 import Image from 'next/image'
+import ModalImage from '../ModalImage'
 
 const PipPal = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -13,24 +14,17 @@ const PipPal = () => {
           {/* Left Column: Project Description */}
           <div className="text-left">
             <p className="font-pixel text-xl">
-              Apprazer is an AI-powered mortgage approval system built by a team of 4 at IrvineHacks.
-              Awarded First American's Best Use Of AI In Real Estate, it streamlines the mortgage approval
-              process by extracting and analyzing financial data in real-time to predict loan eligibility.
+              PipPal is a cutting-edge real-time stock analysis platform designed to empower traders with instantaneous market insights. Operating on 120-minute market windows, the system implements multi-factor pattern validation by leveraging R-squared computations alongside dynamic symmetry analysis to pinpoint trading opportunities with precision.
             </p>
             <ul className="list-disc mt-6 space-y-4">
               <li>
-                <strong>Intelligent Document Processing:</strong> Engineered a system using PyMuPDF and OpenCV for targeted OCR extraction,
-                implementing a coordinate-based ROI method that processes specific form fields with Tesseract OCR.
-                This significantly reduces processing time by scanning only 4% of each page while maintaining 98% accuracy.
+                <strong>Responsive Frontend:</strong> Engineered a dynamic interface using Next.js and TypeScript, enhanced with D3.js to render sophisticated technical indicators and overlay patterns with 60-second real-time updates.
               </li>
               <li>
-                <strong>Loan Decisioning Engine:</strong> Developed a production-grade engine with a scikit-learn Random Forest model 
-                trained on over 6 million records, featuring automated feature engineering and one-hot encoding pipelines.
-                The engine serves real-time predictions through Flask REST endpoints, achieving sub-100ms response times.
+                <strong>Serverless Backend Architecture:</strong> Architected a scalable backend with AWS Lambda and API Gateway. Pattern recognition algorithms written in Python compute key technical indicators—such as VWAP, RSI, and Bollinger Bands—to facilitate in-depth market analysis.
               </li>
               <li>
-                <strong>Analytics Dashboard:</strong> Created a real-time dashboard with Next.js and TailwindCSS,
-                featuring dynamic SVG-based visualizations and data polling every 5 seconds.
+                <strong>Optimized Performance:</strong> Streamlined AWS Lambda through efficient data caching and selective computation techniques, ensuring reliable real-time market data integration via yfinance.
               </li>
             </ul>
           </div>
@@ -51,35 +45,20 @@ const PipPal = () => {
                 />
               </div>
               <figcaption className="mt-2 text-center text-sm text-white">
-                Web Page (Click to Expand)
+                Web Page
               </figcaption>
             </figure>
           </div>
         </div>
       </div>
-
-      {/* Modal for expanded image with caption */}
+      
       {isModalOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50"
-          onClick={() => setIsModalOpen(false)}
-        >
-          <figure className="flex flex-col items-center max-w-full">
-            <div className="w-full">
-              <Image
-                src="/PippalDash.jpg"
-                alt="Expanded System Architecture Diagram"
-                width={1200}
-                height={1200}
-                className="object-contain"
-              />
-            </div>
-            <figcaption className="mt-2 text-center text-sm text-white">
-              Web Page
-            </figcaption>
-          </figure>
-        </div>
-
+        <ModalImage
+          src="/PippalDash.jpg"
+          alt="Expanded System Architecture Diagram"
+          caption="Web Page"
+          onClose={() => setIsModalOpen(false)}
+        />
       )}
     </div>
   )

@@ -1,69 +1,88 @@
-import React from 'react'
+import React, { useState } from 'react'
 import PixelText from '../PixelText'
 import Image from 'next/image'
+import ModalImage from '../ModalImage'
 
 const Uicm = () => {
+  // Using a state object to store modal image details
+  const [modalImage, setModalImage] = useState<{ src: string; alt: string; caption: string } | null>(null)
+
   return (
     <div className="min-h-screen text-white px-4 py-8">
       <div className="flex flex-col">
-
         <PixelText text="UICM" scale={8} />
         <div className="mt-8 max-w-5xl w-full grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Left Column: Project Description */}
-
-
           <div className="text-left">
             <p className="font-pixel text-xl">
-              Apprazer is an AI-powered mortgage approval system built by a team of 4 at IrvineHacks.
-              Awarded First American's Best Use Of AI In Real Estate, it streamlines the mortgage approval
-              process by extracting and analyzing financial data in real-time to predict loan eligibility.
+              UICM (UI Component Manager) is a full-stack platform for sharing and managing reusable UI components.
+              Developed with Next.js, TypeScript, and Express, UICM empowers users to publish, discover, and download community-built components,
+              accelerating development by leveraging proven UI building blocks.
             </p>
 
             <ul className="list-disc mt-6 space-y-4">
               <li>
-                <strong>Intelligent Document Processing:</strong> Engineered a system using PyMuPDF and OpenCV for targeted OCR extraction,
-                implementing a coordinate-based ROI method that processes specific form fields with Tesseract OCR.
-                This significantly reduces processing time by scanning only 4% of each page while maintaining 98% accuracy.
+                <strong>Scalable Monorepo Structure:</strong> Architected the platform using Turborepo to streamline workflows across web and API services,
+                leveraging shared TypeScript configurations and automated build processes for efficient development.
               </li>
               <li>
-                <strong>Loan Decisioning Engine:</strong> Developed a production-grade engine with a scikit-learn Random Forest model 
-                trained on over 6 million records, featuring automated feature engineering and one-hot encoding pipelines.
-                The engine serves real-time predictions through Flask REST endpoints, achieving sub-100ms response times.
+                <strong>Community-Driven UI Sharing:</strong> Built an intuitive system for developers to share and import UI components,
+                featuring an easy-to-use CLI tool alongside a modern web interface that simplifies component discovery and management.
               </li>
               <li>
-                <strong>Analytics Dashboard:</strong> Created a real-time dashboard with Next.js and TailwindCSS,
-                featuring dynamic SVG-based visualizations and data polling every 5 seconds.
+                <strong>Quality-Driven Development:</strong> Utilized automated linting, formatting, and integration testing along with strict GitHub branch rules.
+                Regular sprint meetings and comprehensive planning sessions ensured our team maintained a clear vision and robust API design.
               </li>
             </ul>
           </div>
 
-          {/* Right Column: Image Placeholders with Captions */}
+          {/* Right Column: Image Placeholders with Captions using ModalImage */}
           <div className="space-y-8">
             {/* System Architecture Diagram */}
             <figure>
-              <div className="w-full h-64 flex items-center justify-center">
-                <Image src="/ApprazerDashA.jpg" alt="System Architecture Diagram" width={500} height={500} />
+              <div
+                className="w-full h-64 flex items-center justify-center cursor-pointer"
+                onClick={() =>
+                  setModalImage({
+                    src: "/UICMDashA.jpg",
+                    alt: "System Architecture Diagram",
+                    caption: "Admin Dashboard"
+                  })
+                }
+              >
+                <Image src="/UICMDashA.jpg" alt="System Architecture Diagram" width={500} height={500} />
               </div>
-              <figcaption className="mt-2 text-center text-sm text-white">
-                Admin Dashboard
-              </figcaption>
+              <figcaption className="mt-2 text-center text-sm text-white">Admin Dashboard</figcaption>
             </figure>
 
             {/* Analytics Dashboard Screenshot */}
             <figure>
-              <div className="w-full h-64 flex items-center justify-center">
-                <Image src="/ApprazerDashB.jpg" alt="Analytics Dashboard Screenshot" width={500} height={500} />
+              <div
+                className="w-full h-64 flex items-center justify-center cursor-pointer"
+                onClick={() =>
+                  setModalImage({
+                    src: "/UICMDashB.jpg",
+                    alt: "Analytics Dashboard Screenshot",
+                    caption: "Loan Dashboard"
+                  })
+                }
+              >
+                <Image src="/UICMDashB.jpg" alt="Analytics Dashboard Screenshot" width={500} height={500} />
               </div>
-
-
-              <figcaption className="mt-2 text-center text-sm text-white">
-                Loan Dashboard
-              </figcaption>
+              <figcaption className="mt-2 text-center text-sm text-white">Loan Dashboard</figcaption>
             </figure>
-
           </div>
         </div>
       </div>
+
+      {modalImage && (
+        <ModalImage
+          src={modalImage.src}
+          alt={modalImage.alt}
+          caption={modalImage.caption}
+          onClose={() => setModalImage(null)}
+        />
+      )}
     </div>
   )
 }
