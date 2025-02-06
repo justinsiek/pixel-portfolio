@@ -226,7 +226,7 @@ export function Hero() {
       })
 
       // Initialize ball position near the top right corner
-      const ballStartX = canvas.width * 0.85
+      const ballStartX = canvas.width * 0.8
       const ballStartY = canvas.height * 0.1
 
       ballRef.current = {
@@ -240,7 +240,7 @@ export function Hero() {
       // Add centered static bar under text
       const barPadding = 20 * scale
       const barWidth = 200 * scale
-      const barY = (initialTextY + totalTextHeight + barPadding) * 0.83
+      const barY = (initialTextY + totalTextHeight + barPadding) * 0.8
       const barHeight = adjustedLargePixelSize * 2.25
 
       const paddleWidth = adjustedLargePixelSize
