@@ -146,11 +146,12 @@ const Projects = () => {
       ref={containerRef}
       className="bg-black min-h-screen flex items-center p-5 overflow-x-hidden transition-all duration-500 overflow-hidden"
     >
-      {/* Board container */}
+      {/* Board Container */}
       <div
         className={`flex-shrink-0 transition-all duration-500 ${
-          selectedProject ? 'w-1/4 ml-0' : 'w-full mx-auto scale-100'
+          selectedProject ? 'w-1/4 ml-0' : 'w-2/5 scale-100'
         }`}
+        style={!selectedProject ? { transform: 'translateX(-20px)' } : {}}
       >
         <div
           className="relative border border-white mx-auto"
@@ -203,13 +204,23 @@ const Projects = () => {
         </div>
       </div>
 
-      {/* Project Details Panel */}
-      {selectedProject && (
-        <div className="flex-1 w-2/3 h-screen text-white px-8 py-16 animate-fade-in">
+      {/* Right Panel */}
+      {selectedProject ? (
+        // When a tetromino is selected show the project details
+        <div className="flex-1 w-1/2 h-screen text-white px-8 py-16 animate-fade-in">
           {tetrominoes.find(t => t.id === selectedProject)?.project}
         </div>
+      ) : (
+        // When no tetromino is selected, show the explanatory text, centered both horizontally and vertically.
+        <div className="flex-1 w-3/5 h-screen text-white flex flex-col justify-center pr-48 animate-fade-in">
+          <p className="text-xl mb-4 text-center">
+            Just like how tetrominoes in Tetris interlock to form complete lines, each of my projects build upon the previous ones, creating a cohesive journey of growth and innovation.
+          </p>
+          <p className="text-xl text-center">
+            Click on a tetromino to explore the story behind each project!
+          </p>
+        </div>
       )}
-
     </div>
   )
 }
