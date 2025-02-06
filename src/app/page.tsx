@@ -337,10 +337,20 @@ function Hero() {
             // Resolve collision based on smallest penetration
             if (minPenetration === penetrationLeft || minPenetration === penetrationRight) {
               ball.dx = -ball.dx
-              ball.x += ball.dx * 2 // Move outside paddle
+              // Move ball completely outside paddle bounds
+              if (minPenetration === penetrationLeft) {
+                ball.x = paddle.x - ball.radius - 0.1
+              } else {
+                ball.x = paddle.x + paddle.width + ball.radius + 0.1
+              }
             } else {
               ball.dy = -ball.dy
-              ball.y += ball.dy * 2 // Move outside paddle
+              // Move ball completely outside paddle bounds
+              if (minPenetration === penetrationTop) {
+                ball.y = paddle.y - ball.radius - 0.1
+              } else {
+                ball.y = paddle.y + paddle.height + ball.radius + 0.1
+              }
             }
           }
         }
