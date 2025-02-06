@@ -6,13 +6,14 @@ import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 
 const COLOR = "#FFFFFF"
-const HIT_COLOR = "#333333"
+const HIT_COLOR = "#555555"
 const BACKGROUND_COLOR = "#000000"
 const BALL_COLOR = "#FFFFFF"
 const PADDLE_COLOR = "#FFFFFF"
 const LETTER_SPACING = 1
 const WORD_SPACING = 3
 const SCORE_COLOR = "#FFFFFF"
+
 
 
 interface Pixel {
@@ -131,16 +132,16 @@ export function Hero() {
       const scale = scaleRef.current
       
       // Original sizes
-      const NAME_PIXEL_SIZE = 18 * scale
-      const OTHER_PIXEL_SIZE = 10 * scale  // Reduced from original 1.0 * scale
+      const NAME_PIXEL_SIZE = 11 * scale
+      const OTHER_PIXEL_SIZE = 6 * scale  
       const BALL_SPEED = 6 * scale
 
       pixelsRef.current = []
       const wordGroups = [
-        "JUSTIN SIEK",
+        "z",
         "SOFTWARE DEVELOPER",
         "UI/UX DESIGNER",
-        "FOOD ENTHUSIAST"
+        "SLEEP ENTHUSIAST"
       ]
 
 
@@ -184,8 +185,9 @@ export function Hero() {
 
       const largeTextHeight = 5 * adjustedLargePixelSize
       const smallTextHeight = 5 * adjustedSmallPixelSize
-      const spaceBetweenLines = 2.5 * adjustedLargePixelSize
-      const totalTextHeight = largeTextHeight + (wordGroups.length - 1) * (smallTextHeight + spaceBetweenLines)
+      const nameSpaceBetweenLines = 4 * adjustedLargePixelSize
+      const otherSpaceBetweenLines = 1.5 * adjustedLargePixelSize
+      const totalTextHeight = largeTextHeight + (wordGroups.length - 1) * (smallTextHeight + nameSpaceBetweenLines)
 
       let startY = (canvas.height - totalTextHeight) * 0.4
       const initialTextY = startY
@@ -219,8 +221,8 @@ export function Hero() {
         })
         
         startY += wordIndex === 0 ? 
-          largeTextHeight + spaceBetweenLines : 
-          smallTextHeight + spaceBetweenLines
+          largeTextHeight + nameSpaceBetweenLines : 
+          smallTextHeight + otherSpaceBetweenLines
       })
 
       // Initialize ball position near the top right corner
@@ -232,13 +234,13 @@ export function Hero() {
         y: ballStartY,
         dx: -BALL_SPEED,
         dy: BALL_SPEED,
-        radius: adjustedLargePixelSize / 2.8,
+        radius: adjustedLargePixelSize / 2.5,
       }
 
       // Add centered static bar under text
       const barPadding = 20 * scale
       const barWidth = 200 * scale
-      const barY = (initialTextY + totalTextHeight + barPadding) * 0.9
+      const barY = (initialTextY + totalTextHeight + barPadding) * 0.83
       const barHeight = adjustedLargePixelSize * 2.25
 
       const paddleWidth = adjustedLargePixelSize
