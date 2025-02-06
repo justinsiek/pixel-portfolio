@@ -101,13 +101,13 @@ function Hero() {
           clearInterval(loadInterval)
           setTimeout(() => {
             setLoadingText("DONE!")
-            setTimeout(() => setLoading(false), 1000)
-          }, 500)
+            setTimeout(() => setLoading(false), 500)
+          }, 250)
           return 100
         }
-        return prev + 1
+        return prev + 2
       })
-    }, 30)
+    }, 5)
 
     return () => clearInterval(loadInterval)
   }, [])
@@ -229,7 +229,7 @@ function Hero() {
 
       // Initialize ball position near the top right corner
       const ballStartX = canvas.width * 0.8
-      const ballStartY = canvas.height * 0.1
+      const ballStartY = canvas.height * 0.11
 
       ballRef.current = {
         x: ballStartX,
