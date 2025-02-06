@@ -1,5 +1,5 @@
 import "./globals.css";
-
+import { pixelify } from '@/components/fonts'
 
 export default function RootLayout({
   children,
@@ -7,8 +7,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`antialiased`}>{children}</body>
+    <html lang="en" className={`${pixelify.variable}`}>
+      <body className={`antialiased font-pixel`}>{children}</body>
     </html>
   );
 }

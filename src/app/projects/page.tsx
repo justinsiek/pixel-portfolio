@@ -57,10 +57,11 @@ const tetrominoes = [
       { row: 18, col: 0 },
       { row: 18, col: 1 }
     ],
-    project: <Apprazer />
+    project: <PipPal />
   },
   {
     id: 5,
+
 
     type: 'T',
     positions: [
@@ -69,7 +70,7 @@ const tetrominoes = [
       { row: 16, col: 5 },
       { row: 15, col: 4 }
     ],
-    project: <PipPal />
+    project: <Apprazer />
   },
   {
     id: 6,
@@ -143,12 +144,12 @@ const Projects = () => {
   return (
     <div
       ref={containerRef}
-      className="bg-black min-h-screen flex items-center p-5 overflow-x-hidden transition-all duration-500"
+      className="bg-black min-h-screen flex items-center p-5 overflow-x-hidden transition-all duration-500 overflow-hidden"
     >
       {/* Board container */}
       <div
         className={`flex-shrink-0 transition-all duration-500 ${
-          selectedProject ? 'w-1/3 ml-0' : 'w-full mx-auto scale-100'
+          selectedProject ? 'w-1/4 ml-0' : 'w-full mx-auto scale-100'
         }`}
       >
         <div
@@ -204,10 +205,11 @@ const Projects = () => {
 
       {/* Project Details Panel */}
       {selectedProject && (
-        <div className="flex-1 w-2/3 text-white p-8 animate-fade-in ml-5">
+        <div className="flex-1 w-2/3 h-screen text-white px-8 py-16 animate-fade-in">
           {tetrominoes.find(t => t.id === selectedProject)?.project}
         </div>
       )}
+
     </div>
   )
 }
