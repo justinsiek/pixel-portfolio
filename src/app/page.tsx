@@ -3,7 +3,9 @@
 import { useEffect, useRef, useState } from "react"
 import PIXEL_FONT from "@/components/PixelFont"
 import { useRouter } from "next/navigation"
-import { motion, AnimatePresence } from "framer-motion"
+import LoadingAnimation from "@/components/LoadingAnimation"
+
+
 
 const COLOR = "#FFFFFF"
 const HIT_COLOR = "#333333"
@@ -531,34 +533,7 @@ function Hero() {
 
   return (
     <>
-      <AnimatePresence>
-        {loading && (
-          <motion.div
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black flex items-center justify-center"
-          >
-            <div className="text-center flex flex-col items-center gap-8">
-              <motion.div
-                key={loadingText}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-              >
-                <PixelText text={loadingText} scale={4} color="#FFF" />
-              </motion.div>
-            
-              
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-              >
-                <PixelText text={`${progress}%`} scale={4} color="#FFF" />
-              </motion.div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <LoadingAnimation loadingText={loadingText} progress={progress} />
 
       {!loading && (
         <canvas
