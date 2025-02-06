@@ -149,7 +149,7 @@ const Projects = () => {
       {/* Board Container */}
       <div
         className={`flex-shrink-0 transition-all duration-500 ${
-          selectedProject ? 'w-1/4 ml-0' : 'w-2/5 scale-100'
+          selectedProject ? 'w-1/4 ml-0' : 'w-[45%] scale-100'
         }`}
         style={!selectedProject ? { transform: 'translateX(-20px)' } : {}}
       >
@@ -212,7 +212,7 @@ const Projects = () => {
         </div>
       ) : (
         // When no tetromino is selected, show the explanatory text, centered both horizontally and vertically.
-        <div className="flex-1 w-3/5 h-screen text-white flex flex-col justify-center pr-48 animate-fade-in">
+        <div className="flex-1 w-[55%] h-screen text-white flex flex-col justify-center pr-48 animate-fade-in">
           <p className="text-xl mb-4 text-center">
             Just like how tetrominoes in Tetris interlock to form complete lines, each of my projects build upon the previous ones, creating a cohesive journey of growth and innovation.
           </p>
